@@ -1,4 +1,4 @@
-# GRAVITAS 🌌🔬
+# GRAVITAS
 **Gravity Sensitivity Screening Engine for Space Biology & Tissue Engineering**
 
 [![CI](https://github.com/AryanTakalkar/gravitas-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/AryanTakalkar/gravitas-engine/actions/workflows/ci.yml)
@@ -11,7 +11,7 @@ By linking external fluid dynamics (Grashof, Péclet, Bond dimensionless numbers
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
 - **Multi-Physics Regimes:** Automatically calculates boundaries for buoyancy-driven convection, sedimentation (Stokes), multiphase separation, and hydrostatic pressure across planetary gravity levels (e.g., Lunar, Martian, Microgravity).
 - **Physics-Informed Neural Network (PINN):** Features a state-of-the-art PyTorch AI surrogate trained via Latin Hypercube Sampling. The PINN learns the underlying Michaelis-Menten differential equations, accelerating screening times by 10,000x compared to traditional numerical solvers.
@@ -21,7 +21,7 @@ By linking external fluid dynamics (Grashof, Péclet, Bond dimensionless numbers
 
 ---
 
-## 🛠️ Architecture
+##  Architecture
 
 1. **The Classifier:** Takes fluid properties and cell aggregate geometries to calculate dimensionless numbers, checking if a fluid regime boundary is crossed when gravity drops.
 2. **The Numerical Solver:** Uses finite-difference and SciPy's non-linear root finders to solve the steady-state nutrient concentration gradients.
@@ -30,7 +30,7 @@ By linking external fluid dynamics (Grashof, Péclet, Bond dimensionless numbers
 
 ---
 
-## 🚀 Installation
+##  Installation
 
 GRAVITAS requires Python 3.9 or higher. 
 
@@ -44,7 +44,7 @@ pip install -e .[dev,ai]
 
 ---
 
-## 💻 Usage
+##  Usage
 
 ### 1. Launch the Interactive Dashboard
 The easiest way to analyze an experiment is via the web UI.
@@ -79,7 +79,7 @@ print(f"Limiting Factor: {verdict.limiting_reason}")
 
 ---
 
-## 📂 Directory Structure
+##  Directory Structure
 
 ```text
 gravitas-engine/
@@ -96,11 +96,11 @@ gravitas-engine/
 
 ---
 
-## 🧪 Running Tests
+##  Running Tests
 To ensure the physics engine is mathematically sound, run the validation suite:
 ```bash
 pytest tests/ -v
 ```
 
-## 📄 License
+##  License
 This project is licensed under the MIT License.
