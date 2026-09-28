@@ -1,0 +1,39 @@
+# Reference case, as specified in the Resolute Lab India internship brief:
+# 300 um spherical cell aggregate, standard culture medium, 37 C, 72-hour run,
+# screened at target 1/1000 of standard gravity.
+name: reference_case_300um_aggregate
+aggregate_radius: 150e-6      # m (300 um diameter)
+duration: 259200               # s (72 hours)
+temperature: 310.15            # K (37 C)
+
+medium_density: 1005
+medium_kinematic_viscosity: 8.0e-7
+medium_solutal_expansion: 3.0e-4
+medium_surface_tension: 0.070
+
+membrane_permeability_1g:
+  oxygen: 5.0e-6
+  glucose: 5.0e-6
+  metabolite: 5.0e-6
+
+species:
+  - name: oxygen
+    diffusivity: 1.8e-9
+    michaelis_constant: 4.6e-3
+    max_uptake_rate: 4.0e-4
+    bulk_concentration: 0.2       # mol/m^3, ~ physiological dissolved O2 in medium
+    measurement_uncertainty: 0.05 # 5%
+
+  - name: glucose
+    diffusivity: 6.7e-10
+    michaelis_constant: 1.0
+    max_uptake_rate: 2.0e-4
+    bulk_concentration: 5.0        # mol/m^3, ~ 5 mM standard culture medium glucose
+    measurement_uncertainty: 0.05 # 5%
+
+  - name: metabolite
+    diffusivity: 5.0e-10
+    michaelis_constant: 2.0
+    max_uptake_rate: -1.0e-4
+    bulk_concentration: 0.5
+    measurement_uncertainty: 0.10 # 10%

@@ -1,0 +1,30 @@
+# Secondary case: a larger (1 mm) hepatic organoid with higher consumption rates
+name: hepatic_organoid_1mm
+aggregate_radius: 500e-6      # m (1000 um diameter)
+duration: 259200               # s (72 hours)
+temperature: 310.15            # K (37 C)
+
+# Slightly denser medium for organoid culture
+medium_density: 1010
+medium_kinematic_viscosity: 8.5e-7
+medium_solutal_expansion: 3.5e-4
+medium_surface_tension: 0.072
+
+membrane_permeability_1g:
+  oxygen: 8.0e-6
+  glucose: 7.0e-6
+
+species:
+  - name: oxygen
+    diffusivity: 1.8e-9
+    michaelis_constant: 4.6e-3
+    max_uptake_rate: 6.0e-4       # Higher uptake for hepatic cells
+    bulk_concentration: 0.2       # mol/m^3
+    measurement_uncertainty: 0.05 # 5%
+
+  - name: glucose
+    diffusivity: 6.7e-10
+    michaelis_constant: 1.0
+    max_uptake_rate: 3.0e-4
+    bulk_concentration: 10.0      # Higher glucose medium
+    measurement_uncertainty: 0.05 # 5%

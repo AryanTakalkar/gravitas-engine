@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gravitas"
+version = "0.1.0"
+description = "Gravity Sensitivity Screening Engine"
+readme = "README.md"
+authors = [
+    { name = "Resolute Lab India" }
+]
+requires-python = ">=3.9"
+dependencies = [
+    "numpy",
+    "scipy",
+    "PyYAML",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "streamlit",
+    "matplotlib",
+]
+ai = [
+    "torch>=2.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

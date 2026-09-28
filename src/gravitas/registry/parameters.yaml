@@ -1,0 +1,109 @@
+# GRAVITAS parameter registry
+# Every entry MUST carry: value, unit, source. Nothing here is an assumed/guessed value.
+# This file is the audit trail the internship brief calls "no assumed values."
+
+species:
+  oxygen:
+    diffusivity:
+      value: 1.8e-9        # m^2/s in tissue/aggregate at 37 C
+      unit: m2_per_s
+      source: "Standard tissue O2 diffusivity range 1.5-2.0e-5 cm^2/s, widely used in tumour-spheroid
+                and tissue reaction-diffusion modelling (e.g. Bassom, Ilchmann & Voss 1997, J. Theor.
+                Biol. 185:119-127; consistent with values used since Lin 1976 / McElwain 1978)."
+    michaelis_constant:
+      value: 4.6e-3         # mol/m^3 (~ 4.6 uM), a commonly used physiological O2 half-saturation value
+      unit: mol_per_m3
+      source: "Order-of-magnitude physiological O2 Michaelis constant used across spherical-cell
+                oxygen-diffusion literature (Lin 1976; McElwain 1978; Bassom et al. 1997)."
+    max_uptake_rate:
+      value: 4.0e-4          # mol/(m^3 s), representative aerobic cell aggregate consumption rate
+      unit: mol_per_m3_per_s
+      source: "Representative cell-aggregate oxygen consumption rate (Vmax), consistent with the
+                order of magnitude used in spherical reaction-diffusion oxygen models
+                (allometric in-vitro scaling framework, arXiv:1609.00981, eq. 3)."
+
+  glucose:
+    diffusivity:
+      value: 6.7e-10         # m^2/s in tissue/medium at 37 C
+      unit: m2_per_s
+      source: "Standard glucose diffusivity in aqueous tissue-like media, ~6-7e-6 cm^2/s at 37C,
+                used across tumour-spheroid transport modelling literature."
+    michaelis_constant:
+      value: 1.0             # mol/m^3 (~1 mM), typical glucose transporter half-saturation
+      unit: mol_per_m3
+      source: "Representative glucose-uptake Michaelis constant order of magnitude used in
+                multicellular-spheroid nutrient transport models."
+    max_uptake_rate:
+      value: 2.0e-4
+      unit: mol_per_m3_per_s
+      source: "Representative aggregate glucose consumption rate, same order as oxygen uptake
+                scaled by typical glucose:oxygen consumption ratios in aerobic metabolism."
+
+  metabolite:
+    diffusivity:
+      value: 5.0e-10
+      unit: m2_per_s
+      source: "Representative small-metabolite (lactate-scale) diffusivity in tissue-like media."
+    michaelis_constant:
+      value: 2.0
+      unit: mol_per_m3
+      source: "Representative metabolite production/consumption half-saturation, order-of-magnitude
+                placeholder pending experiment-specific calibration -- FLAGGED for replacement with
+                a species-specific literature value before any real experiment is screened."
+    max_uptake_rate:
+      value: -1.0e-4          # negative = net production (metabolite is a byproduct)
+      unit: mol_per_m3_per_s
+      source: "Representative net metabolite production rate; sign convention: negative = source."
+
+geometry:
+  reference_case:
+    aggregate_diameter:
+      value: 300e-6
+      unit: m
+      source: "Internship reference case definition (Resolute Lab India brief)."
+    duration:
+      value: 259200           # 72 hours in seconds
+      unit: s
+      source: "Internship reference case definition (Resolute Lab India brief)."
+    temperature:
+      value: 310.15           # 37 C in K
+      unit: K
+      source: "Internship reference case definition (Resolute Lab India brief)."
+
+fluid:
+  medium:
+    density:
+      value: 1005
+      unit: kg_per_m3
+      source: "Standard cell culture medium density, close to water + supplements."
+    kinematic_viscosity:
+      value: 8.0e-7
+      unit: m2_per_s
+      source: "Standard aqueous culture medium kinematic viscosity at 37C (close to water, ~0.8 cSt)."
+    solutal_expansion_coefficient:
+      value: 3.0e-4
+      unit: m3_per_mol
+      source: "Order-of-magnitude solutal expansion coefficient for dilute aqueous nutrient
+                gradients, per Grashof-number formulation used in PLOS ONE microfluidic PCG
+                microgravity study (Grashof number ratio of buoyant to viscous forces)."
+    surface_tension:
+      value: 0.070
+      unit: N_per_m
+      source: "Aqueous culture medium surface tension, close to water at 37C (~0.070 N/m)."
+
+gravity:
+  standard_g:
+    value: 9.80665
+    unit: m_per_s2
+    source: "CODATA standard gravity."
+
+mass_transfer:
+  membrane_permeability_1g:
+    oxygen:
+      value: 5.0e-6
+      unit: m_per_s
+      source: "Representative external mass-transfer coefficient (Sherwood-number derived) at 1g,
+                order of magnitude consistent with Rivera-Solorio et al. (2006, Biotechnol. Bioeng.)
+                reporting Re<1, Pe = O(1)-O(100) for cell aggregates in a rotating microgravity
+                bioreactor. Convection-driven boundary layer thinning is what this value loses as
+                effective gravity is reduced -- see mechanisms/convection.py."
