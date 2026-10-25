@@ -14,18 +14,18 @@ By linking external fluid dynamics (Grashof, Péclet, Bond dimensionless numbers
 ##  Key Features
 
 - **Multi-Physics Regimes:** Automatically calculates boundaries for buoyancy-driven convection, sedimentation (Stokes), multiphase separation, and hydrostatic pressure across planetary gravity levels (e.g., Lunar, Martian, Microgravity).
-- **Physics-Informed Neural Network (PINN):** Features a state-of-the-art PyTorch AI surrogate trained via Latin Hypercube Sampling. The PINN learns the underlying Michaelis-Menten differential equations, accelerating screening times by 10,000x compared to traditional numerical solvers.
+- **Physics-Informed Neural Network (PINN):** Features a PyTorch AI surrogate architecture trained via Latin Hypercube Sampling to learn the underlying Michaelis-Menten differential equations (implemented, validation in progress).
 - **Strict Data Provenance:** Every physical constant used in the engine is tracked in a centralized YAML registry with direct academic citations, ensuring aerospace-grade auditability.
 - **Interactive Dashboard:** Includes a Streamlit web application for real-time visualization of mechanism rankings and concentration profiles.
-- **CI/CD Pipeline:** Fully version-controlled with a GitHub Actions pipeline ensuring mathematical limits and determinism tests pass on every commit.
+- **CI/CD Pipeline:** Fully version-controlled with a GitHub Actions matrix (Ubuntu, Windows, macOS x Python 3.10, 3.12) ensuring mathematical limits, golden values, and determinism tests pass on every commit.
 
 ---
 
 ##  Architecture
 
 1. **The Classifier:** Takes fluid properties and cell aggregate geometries to calculate dimensionless numbers, checking if a fluid regime boundary is crossed when gravity drops.
-2. **The Numerical Solver:** Uses finite-difference and SciPy's non-linear root finders to solve the steady-state nutrient concentration gradients.
-3. **The AI Surrogate:** A Parametric PINN that replaces the numerical solver for instantaneous Generative Design iterations.
+2. **The Numerical Solver:** Uses finite-difference and SciPy's non-linear root finders to solve the steady-state nutrient concentration gradients with configurable boundary coupling (heuristic floor or Churchill correlation).
+3. **The AI Surrogate:** A Parametric PINN (implemented, validation in progress) targeting rapid design space exploration.
 4. **The Verdict Engine:** Compares the drop in central nutrient concentration against biological measurement uncertainty to issue a definitive **PASS**, **MARGINAL**, or **FAIL**.
 
 ---
@@ -86,20 +86,27 @@ gravitas-engine/
 ├── dashboard.py                # Streamlit Web UI
 ├── train_pinn.py               # AI Training script for the PINN
 ├── examples/                   # YAML files defining cell organoid experiments
+├── scripts/                    # Benchmark, sweep, mechanism, and physical coupling scripts
 ├── src/gravitas/               # Core Engine Source Code
 │   ├── ai/                     # PyTorch PINN Architecture & Physics Loss
 │   ├── mechanisms/             # Dimensionless fluid dynamics logic
 │   ├── registry/               # Data provenance and cited physical constants
-│   └── solver/                 # 1D Finite-Difference Reaction-Diffusion solver
-└── tests/                      # PyTest suite for analytical limits and convergence
+│   └── solver/                 # 1D Finite-Difference Reaction-Diffusion solver & coupling
+└── tests/                      # 42 unit, limit, determinism, golden-value, and coupling tests
 ```
 
 ---
 
-##  Running Tests
-To ensure the physics engine is mathematically sound, run the validation suite:
+##  Running Tests & Coverage
+Run the automated test suite (42 unit, limit, convergence, golden-value, and coupling tests) with coverage:
 ```bash
-pytest tests/ -v
+pytest tests/ -v --cov=gravitas --cov-report=term-missing
+```
+
+##  Benchmark Runtime
+Measure reference-case screening runtime:
+```bash
+python scripts/benchmark_runtime.py
 ```
 
 ##  License

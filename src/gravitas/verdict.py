@@ -12,6 +12,7 @@ from .experiment import Experiment
 from .classifier import classify, MechanismResult
 from .solver.kinetics import dimensionless_groups
 from .solver.reaction_diffusion import solve_steady_state
+from .solver.coupling import COUPLING_MODELS, churchill_coupling
 from .registry.provenance import get_registry_provenance
 
 STANDARD_G = 9.80665  # m/s^2, CODATA
@@ -38,6 +39,7 @@ class Verdict:
     limiting_reason: str
     uncertainty_threshold: float
     provenance: dict[str, str]
+    coupling: str = "heuristic"    # gravity->H coupling model used for this verdict
 
 
 def _membrane_permeability_at_g(H_1g: float, g: float, standard_g: float,
@@ -59,7 +61,8 @@ def _membrane_permeability_at_g(H_1g: float, g: float, standard_g: float,
 
 def screen(experiment: Experiment, target_g: float,
            marginal_band: float = 1.5,
-           standard_g: float = STANDARD_G) -> Verdict:
+           standard_g: float = STANDARD_G,
+           coupling: str = "heuristic") -> Verdict:
     """Screen `experiment` for gravity sensitivity at `target_g` (m/s^2).
 
     uncertainty_fraction: measurement uncertainty + biological variability,
@@ -69,7 +72,12 @@ def screen(experiment: Experiment, target_g: float,
     marginal_band: a predicted change between 1x and `marginal_band`x the
         uncertainty threshold is reported as MARGINAL rather than a hard
         PASS/FAIL.
+    coupling: gravity -> boundary-coefficient model: "heuristic" (default, 10 % floor),
+        "churchill_film" or "churchill_series" (natural-convection correlation for a sphere;
+        see solver/coupling.py for assumptions and limits).
     """
+    if coupling not in COUPLING_MODELS:
+        raise ValueError(f"unknown coupling {coupling!r}; choose one of {COUPLING_MODELS}")
     mechanism_ranking = classify(experiment, standard_g=standard_g, target_g=target_g)
 
     observables: list[ObservableResult] = []
@@ -79,7 +87,14 @@ def screen(experiment: Experiment, target_g: float,
         alpha, K = dimensionless_groups(species, experiment.aggregate_radius)
         H_1g = experiment.membrane_permeability_1g[species.name] \
             * experiment.aggregate_radius / species.diffusivity  # dimensionless H = h*a/D
-        H_target = _membrane_permeability_at_g(H_1g, target_g, standard_g)
+        if coupling == "heuristic":
+            H_target = _membrane_permeability_at_g(H_1g, target_g, standard_g)
+        else:
+            H_target = churchill_coupling(
+                H_1g, target_g, standard_g, beta=experiment.medium_solutal_expansion,
+                delta_c=species.bulk_concentration, radius=experiment.aggregate_radius,
+                nu=experiment.medium_kinematic_viscosity, D=species.diffusivity,
+                mode=coupling.split("_", 1)[1])
 
         _, C_1g = solve_steady_state(alpha=alpha, K=K, H=H_1g)
         _, C_target = solve_steady_state(alpha=alpha, K=K, H=H_target)
@@ -128,4 +143,5 @@ def screen(experiment: Experiment, target_g: float,
         limiting_reason=reason,
         uncertainty_threshold=threshold,
         provenance=get_registry_provenance(),
+        coupling=coupling,
     )

@@ -31,3 +31,7 @@ venv.bak/
 surrogate_pinn.pth
 *.png
 .pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+results/
