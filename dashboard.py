@@ -19,6 +19,7 @@ example_names = [f.name for f in example_files]
 
 selected_example = st.sidebar.selectbox("Select Experiment Configuration", example_names)
 target_g_input = st.sidebar.number_input("Target Gravity (m/s^2)", value=9.80665e-3, format="%.5e")
+coupling_model = st.sidebar.selectbox("Boundary Coupling Model", ["heuristic", "churchill_film", "churchill_series"], index=0)
 
 if selected_example:
     experiment_path = examples_dir / selected_example
@@ -27,9 +28,10 @@ if selected_example:
     st.sidebar.subheader("Experiment Summary")
     st.sidebar.text(f"Name: {experiment.name}")
     st.sidebar.text(f"Radius: {experiment.aggregate_radius * 1e6:.1f} µm")
+    st.sidebar.text(f"Coupling: {coupling_model}")
     
     # Run screen
-    verdict = screen(experiment, target_g=target_g_input)
+    verdict = screen(experiment, target_g=target_g_input, coupling=coupling_model)
     
     st.header("Screening Verdict")
     
@@ -70,9 +72,17 @@ if selected_example:
         worst_species = next(s for s in experiment.species if s.name == verdict.limiting_mechanism)
         
         alpha, K = dimensionless_groups(worst_species, experiment.aggregate_radius)
-        H_1g = experiment.membrane_permeability_1g[worst_species.name] \
-            * experiment.aggregate_radius / worst_species.diffusivity
-        H_target = _membrane_permeability_at_g(H_1g, target_g_input, STANDARD_G)
+        H_1g = (experiment.membrane_permeability_1g[worst_species.name]
+                * experiment.aggregate_radius / worst_species.diffusivity)
+        if coupling_model == "heuristic":
+            H_target = _membrane_permeability_at_g(H_1g, target_g_input, STANDARD_G)
+        else:
+            from gravitas.solver.coupling import churchill_coupling
+            H_target = churchill_coupling(
+                H_1g, target_g_input, STANDARD_G, beta=experiment.medium_solutal_expansion,
+                delta_c=worst_species.bulk_concentration, radius=experiment.aggregate_radius,
+                nu=experiment.medium_kinematic_viscosity, D=worst_species.diffusivity,
+                mode=coupling_model.split("_", 1)[1])
         
         r_nodes, C_1g = solve_steady_state(alpha=alpha, K=K, H=H_1g)
         _, C_target = solve_steady_state(alpha=alpha, K=K, H=H_target)
