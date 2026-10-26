@@ -1,0 +1,24 @@
+name: "EMT6 Spheroid Microelectrode Benchmark (Müller-Klieser et al. 1986)"
+description: "Validation benchmark based on experimental microelectrode measurements of oxygen partial pressure profiles in EMT6/Ro multicellular tumor spheroids."
+citation: "Müller-Klieser, W., Freyer, J. P., & Sutherland, R. M. (1986). Influence of glucose and oxygen supply conditions on the oxygenation of multicellular spheroids. British Journal of Cancer, 53(3), 345-353."
+
+aggregate_radius: 200.0e-6    # m (200 um radius = 400 um diameter)
+duration: 259200.0            # s (72 hours)
+temperature: 310.15           # K (37 C)
+aggregate_density: 1055.0     # kg/m^3 (standard mammalian cell aggregate density)
+
+medium_density: 1005.0        # kg/m^3 (aqueous culture medium at 37 C)
+medium_kinematic_viscosity: 8.0e-7  # m^2/s
+medium_solutal_expansion: 3.0e-4    # m^3/mol
+medium_surface_tension: 0.070       # N/m
+
+species:
+  - name: "oxygen"
+    diffusivity: 1.82e-9            # m^2/s (Krogh tissue diffusion coefficient)
+    bulk_concentration: 0.180       # mol/m^3 (corresponds to PO2 ~ 138 mmHg in equilibrium with air)
+    michaelis_constant: 4.6e-3      # mol/m^3 (~3.5 mmHg half-saturation)
+    max_uptake_rate: 4.24e-2        # mol/(m^3 s) (corresponds to ~0.95e-3 ml_O2/(cm^3 s) for EMT6 in Freyer & Sutherland 1986)
+    measurement_uncertainty: 0.05   # 5% relative uncertainty of microelectrode sensor
+
+membrane_permeability_1g:
+  oxygen: 2.3e-4                    # m/s (gives H = h*a/D = 25.3, matching thin boundary layer in stirred chamber)

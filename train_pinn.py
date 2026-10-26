@@ -3,7 +3,10 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 from scipy.stats import qmc
 import numpy as np
-from src.gravitas.ai.pinn import ReactionDiffusionPINN, physics_loss
+try:
+    from gravitas.ai.pinn import ReactionDiffusionPINN, physics_loss
+except ImportError:
+    from src.gravitas.ai.pinn import ReactionDiffusionPINN, physics_loss
 
 def train():
     print("Initializing Physics-Informed Neural Network (PINN)...")

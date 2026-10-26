@@ -35,3 +35,5 @@ surrogate_pinn.pth
 coverage.xml
 htmlcov/
 results/
+results_baseline/
+*.pth

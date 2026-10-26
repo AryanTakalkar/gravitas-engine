@@ -61,7 +61,15 @@ def test_unknown_mode_and_unknown_coupling_raise():
 
 def test_default_coupling_is_heuristic_and_recorded():
     assert screen(_load("reference_case.yaml"), 1.0).coupling == "heuristic"
-    assert set(COUPLING_MODELS) == {"heuristic", "churchill_film", "churchill_series"}
+    assert set(COUPLING_MODELS) == {"heuristic", "churchill_film", "churchill_series", "perfusion"}
+
+
+def test_perfusion_maintains_mass_transfer_in_microgravity():
+    # Perfusion velocity U = 1 mm/s decouples mass transfer from gravity
+    e = _load("reference_case.yaml")
+    v_perf = screen(e, 1e-3 * STD, coupling="perfusion", flow_velocity=1e-3)
+    assert v_perf.coupling == "perfusion"
+    assert v_perf.result in ("PASS", "MARGINAL", "FAIL")
 
 
 @pytest.mark.parametrize("mode", ["churchill_film", "churchill_series"])

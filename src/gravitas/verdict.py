@@ -12,7 +12,7 @@ from .experiment import Experiment
 from .classifier import classify, MechanismResult
 from .solver.kinetics import dimensionless_groups
 from .solver.reaction_diffusion import solve_steady_state
-from .solver.coupling import COUPLING_MODELS, churchill_coupling
+from .solver.coupling import COUPLING_MODELS, churchill_coupling, perfusion_coupling
 from .registry.provenance import get_registry_provenance
 
 STANDARD_G = 9.80665  # m/s^2, CODATA
@@ -62,19 +62,20 @@ def _membrane_permeability_at_g(H_1g: float, g: float, standard_g: float,
 def screen(experiment: Experiment, target_g: float,
            marginal_band: float = 1.5,
            standard_g: float = STANDARD_G,
-           coupling: str = "heuristic") -> Verdict:
+           coupling: str = "heuristic",
+           flow_velocity: float = 1e-4) -> Verdict:
     """Screen `experiment` for gravity sensitivity at `target_g` (m/s^2).
 
     uncertainty_fraction: measurement uncertainty + biological variability,
-        expressed as a fraction of the 1g observable value (a simple,
-        explicit uncertainty model -- swap in a per-species value from real
-        instrument/assay specs for a production screening run).
+        expressed as a fraction of the 1g observable value.
     marginal_band: a predicted change between 1x and `marginal_band`x the
         uncertainty threshold is reported as MARGINAL rather than a hard
         PASS/FAIL.
-    coupling: gravity -> boundary-coefficient model: "heuristic" (default, 10 % floor),
-        "churchill_film" or "churchill_series" (natural-convection correlation for a sphere;
-        see solver/coupling.py for assumptions and limits).
+    coupling: gravity -> boundary-coefficient model:
+        "heuristic" (default, 10 % floor),
+        "churchill_film" or "churchill_series" (natural-convection correlation for a sphere),
+        "perfusion" (forced convection via Ranz-Marshall correlation for perfused bioreactors).
+    flow_velocity: superficial medium velocity (m/s) when coupling="perfusion".
     """
     if coupling not in COUPLING_MODELS:
         raise ValueError(f"unknown coupling {coupling!r}; choose one of {COUPLING_MODELS}")
@@ -89,6 +90,11 @@ def screen(experiment: Experiment, target_g: float,
             * experiment.aggregate_radius / species.diffusivity  # dimensionless H = h*a/D
         if coupling == "heuristic":
             H_target = _membrane_permeability_at_g(H_1g, target_g, standard_g)
+        elif coupling == "perfusion":
+            H_target = perfusion_coupling(
+                H_1g, flow_velocity, standard_g, beta=experiment.medium_solutal_expansion,
+                delta_c=species.bulk_concentration, radius=experiment.aggregate_radius,
+                nu=experiment.medium_kinematic_viscosity, D=species.diffusivity)
         else:
             H_target = churchill_coupling(
                 H_1g, target_g, standard_g, beta=experiment.medium_solutal_expansion,
